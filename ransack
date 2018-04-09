@@ -1,0 +1,2 @@
+#!/bin/sh
+egrep -R -H -n -B1 -A2 --include=*.c --include=*.h "$1"

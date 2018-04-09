@@ -1,0 +1,9 @@
+#!/bin/sh
+find . -name "*.c" -or -name "*.h" > filenames.txt
+echo "start reformat"
+for FILENAME in `cat filenames.txt`
+    do
+        indent -kr --no-tabs $FILENAME
+        rm $FILENAME~
+    done
+rm filenames.txt

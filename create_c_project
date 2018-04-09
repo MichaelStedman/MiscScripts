@@ -1,0 +1,114 @@
+#!/bin/sh
+projectName=$1
+mkdir $projectName
+mkdir $projectName/bin
+mkdir $projectName/src
+mkdir $projectName/src/include
+mkdir $projectName/tests
+mkdir $projectName/tests/include
+################################################################################
+echo Create the makefile
+cd $projectName
+echo  "test:" > makefile
+echo  "\t@gcc -g -lrt -lm -o bin/test$projectName tests/test$projectName.c src/library.c -I." >> makefile
+echo  "\t@bin/test$projectName" >> makefile
+echo  "build:" >> makefile
+echo  "\t@gcc -g -lrt -lm -o bin/$projectName src/$projectName.c src/library.c -I." >> makefile
+echo  "all:" >> makefile
+echo  "\t@gcc -g -lrt -lm -o bin/$projectName src/$projectName.c src/library.c -I." >> makefile
+echo  "\t@gcc -g -lrt -lm -o bin/test$projectName tests/test$projectName.c src/library.c -I." >> makefile
+
+################################################################################
+echo Create the main source file
+cd src
+cat > $projectName.c <<-EOF
+/*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+#include <stdio.h>
+#include "include/library.h"
+
+int main(int argc, char **argv)
+{
+    printf("Hello World\n");
+}
+EOF
+
+################################################################################
+echo Create the library file
+#cd $projectName/src
+cat > library.c <<-EOF
+/*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+#include "include/library.h"
+EOF
+
+################################################################################
+echo Create the library header file
+cd include
+cat > library.h <<-EOF
+/*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdbool.h>
+#include <assert.h>
+#include <stdarg.h>
+EOF
+
+################################################################################
+echo Create the main test source file
+cd ../../tests
+cat > test$projectName.c <<- EOF
+/*
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*/
+
+#include "include/minunit.h"
+#include "../src/include/library.h"
+
+void test_setup(void) {
+	/* Nothing */
+}
+
+void test_teardown(void) {
+	/* Nothing */
+}
+
+MU_TEST(test_fail) {
+	mu_fail("Hello World!");
+}
+
+MU_TEST_SUITE(test_suite) {
+	MU_SUITE_CONFIGURE(&test_setup, &test_teardown);
+
+	MU_RUN_TEST(test_fail);
+}
+
+int main(int argc, char **argv)
+{
+    MU_RUN_SUITE(test_suite);
+    MU_REPORT();
+    return 0;    
+}
+EOF
+
+################################################################################
+echo Create minunit unit test header file
+cd include
+curl https://raw.githubusercontent.com/MichaelStedman/HelloWorldC/master/tests/include/minunit.h > minunit.h
+
