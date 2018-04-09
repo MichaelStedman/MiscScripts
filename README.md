@@ -10,8 +10,16 @@ Searches current folder and sub folders for supplied search string in C files of
 #### reformat
 Reformats all *.c and *h files in the current folder and sub folders using indent
 
+#### CreateVsCodeSolution.sh
+Creates a skeleton C# solution with main and unit test projects
+
 ### Bash scripts that live in ~/go/src
 #### gotest.sh
 Runs go test for a single file. Used by VS Code "gotest" task.
+
+### Bash scripts that live in ~/projects/lbac
+#### runtests.sh
+Runs dotnet tests. Used by VS Code "test" task.
+
 
 
