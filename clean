@@ -1,0 +1,5 @@
+#!/bin/sh
+find . -type f -name '*.c.gcov' -exec rm {} +
+find . -type f -name '*.h.gcov' -exec rm {} +
+find . -type f -name '*.gcda' -exec rm {} +
+find . -type f -name '*.gcno' -exec rm {} +
