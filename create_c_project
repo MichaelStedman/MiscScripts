@@ -9,14 +9,32 @@ mkdir $projectName/tests/include
 ################################################################################
 echo Create the makefile
 cd $projectName
-echo  "test:" > makefile
-echo  "\t@gcc -g -lrt -lm -o bin/test$projectName tests/test$projectName.c src/library.c -I." >> makefile
+echo  "CC=gcc" > makefile
+echo  "test:" >> makefile
+echo  "\t@\$(CC) -g -lrt -lm -o bin/test$projectName tests/test$projectName.c src/library.c -I." >> makefile
 echo  "\t@bin/test$projectName" >> makefile
 echo  "build:" >> makefile
-echo  "\t@gcc -g -lrt -lm -o bin/$projectName src/$projectName.c src/library.c -I." >> makefile
+echo  "\t@\$(CC) -g -lrt -lm -o bin/$projectName src/$projectName.c src/library.c -I." >> makefile
 echo  "all:" >> makefile
-echo  "\t@gcc -g -lrt -lm -o bin/$projectName src/$projectName.c src/library.c -I." >> makefile
-echo  "\t@gcc -g -lrt -lm -o bin/test$projectName tests/test$projectName.c src/library.c -I." >> makefile
+echo  "\t@\$(CC) -g -lrt -lm -o bin/$projectName src/$projectName.c src/library.c -I." >> makefile
+echo  "\t@\$(CC) -g -lrt -lm -o bin/test$projectName tests/test$projectName.c src/library.c -I." >> makefile
+echo  "cov:" >> makefile		
+echo  "\t@\$(CC) -g -lrt -lm -Wall -fprofile-arcs -ftest-coverage -o bin/test$projectName tests/test$projectName.c src/library.c -I." >> makefile
+echo  "\tlcov --directory . --zerocounters" >> makefile
+echo  "\t@bin/test$projectName" >> makefile
+echo  "\tgcov test$projectName" >> makefile
+echo  "\tgcov library" >> makefile
+echo  "\tlcov --directory . --capture --output-file coverage/app.info" >> makefile
+echo  "\tgenhtml coverage/app.info -o ./coverage" >> makefile
+echo  "travistest:" >> makefile
+echo  "\t\$(CC) -g -lrt -lm -Wall -fprofile-arcs -ftest-coverage -o test$projectName tests/test$projectName.c src/library.c -I." >> makefile
+echo  "\t./test$projectName" >> makefile
+echo  "\tgcov test$projectName" >> makefile
+echo  "\tgcov library" >> makefile
+echo  "travisbuild:" >> makefile
+echo  "\t\$(CC) -g -lrt -lm -Wall -fprofile-arcs -ftest-coverage -o $projectName src/$projectName.c src/library.c -I." >> makefile
+echo  "\t./$projectName" >> makefile
+echo  "\tgcov $projectName" >> makefile
 
 ################################################################################
 echo Create the main source file
