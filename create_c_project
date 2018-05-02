@@ -66,6 +66,52 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 */
 
 #include "include/library.h"
+int MEMORY_ALLOCATION_COUNTER = 0;
+int NULL_DEALLOCATION_COUNTER = 0;
+
+///
+/// Wrapper for malloc() to keep count of the number of memory allocations to
+/// help tracking memory leaks.
+///
+void *allocate(size_t size)
+{
+    void *p = malloc(size);
+    if (p == NULL) {
+        perror("Unable to allocate buffer");
+        exit(1);
+    }
+    MEMORY_ALLOCATION_COUNTER++;
+    return p;
+}
+
+///
+/// Wrapper for calloc() to keep count of the number of memory allocations to
+/// help tracking memory leaks.
+///
+void *allocate_clear(size_t nmemb, size_t size)
+{
+    void *p = calloc(nmemb, size);
+    if (p == NULL) {
+        perror("Unable to allocate buffer");
+        exit(1);
+    }
+    MEMORY_ALLOCATION_COUNTER++;
+    return p;
+}
+
+///
+/// Wrapper for free() to keep count of the number of memory deallocations to 
+/// help tracking memory leaks. Also counts attempts to deallocate on NULL pointers.
+///
+void deallocate(void *ptr)
+{
+    if (!ptr) {
+        NULL_DEALLOCATION_COUNTER++;
+        return;
+    }
+    MEMORY_ALLOCATION_COUNTER--;
+    free(ptr);
+}
 EOF
 
 ################################################################################
@@ -84,6 +130,26 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #include <stdbool.h>
 #include <assert.h>
 #include <stdarg.h>
+//
+// Version macros for compile-time API detection
+//
+#define MED_VERSION_MAJOR   1
+#define MED_VERSION_MINOR   0
+#define MED_VERSION_PATCH   0
+#define MED_MAKE_VERSION(major, minor, patch) \
+    ((major) * 10000 + (minor) * 100 + (patch))
+#define MED_VERSION \
+    MED_MAKE_VERSION(MED_VERSION_MAJOR, \
+    MED_VERSION_MINOR, \
+    MED_VERSION_PATCH)
+//
+// Wrappers for malloc(), calloc() and free()
+//
+void* allocate(size_t size);
+void* allocate_clear(size_t nmemb, size_t size);
+void deallocate(void *ptr);
+extern int MEMORY_ALLOCATION_COUNTER;
+extern int NULL_DEALLOCATION_COUNTER;    
 EOF
 
 ################################################################################
@@ -121,6 +187,18 @@ int main(int argc, char **argv)
 {
     MU_RUN_SUITE(test_suite);
     MU_REPORT();
+    
+    if (MEMORY_ALLOCATION_COUNTER != 0 || NULL_DEALLOCATION_COUNTER != 0) {
+        printf
+            ("\033[0;31m----------------------------------------------\n");
+        printf("Net Memory Allocations    = %i\n",
+               MEMORY_ALLOCATION_COUNTER);
+        printf("NULL Memory Deallocations = %i\n",
+               NULL_DEALLOCATION_COUNTER);
+        printf
+            ("----------------------------------------------\033[0m\n\n");
+    }
+        
     return 0;    
 }
 EOF
