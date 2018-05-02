@@ -14,7 +14,7 @@ Creates a skeleton C project with unit tests provided by minunit.
 Searches current folder and sub folders for supplied search string in C files of *.c and *h
 
 #### reformat
-Reformats all *.c and *h files in the current folder and sub folders using indent
+Reformats all *.c files in the current folder and sub folders using indent. Or reformat individual file named on command line.
 
 ### Bash scripts that live in ~/go/src
 #### gotest.sh
